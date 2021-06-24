@@ -1,18 +1,48 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <ul>
+      <li v-for="blog in blogs" :key="blog.id" ><router-link :to="'/blog/' + blog.id" >{{ blog.title }}</router-link></li>
+    </ul>
   </div>
 </template>
 
 <script>
-// @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue'
+  import getBlogs  from '../composables/getBlogs'
 
 export default {
-  name: 'Home',
-  components: {
-    HelloWorld
-  }
+  setup(){
+    const { blogs , errors , load } = getBlogs()
+    
+    load()
+    return { blogs ,errors }
+  },
+
+
+
 }
 </script>
+
+<style scoped>
+  ul{
+    list-style: none;
+    max-width: 700px;
+    margin: 10px auto;
+    background-color: white;
+    font-size: 18px;
+    padding: 0;
+  }
+  li{
+    border-bottom: 1px solid lightgray;
+  }
+  a{
+    display: block;
+    padding: 20px;
+    text-decoration: none;
+    color:rgb(102, 101, 101);
+
+  }
+  a:hover{
+      color: blue
+  }
+
+</style>

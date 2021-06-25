@@ -1,8 +1,9 @@
 <template>
   <div class="addBlog">
       <h1>Add a new blog</h1>
-      <form @submit.prevent="add"> 
+      <form @submit.prevent="edit">  
           <Alert :errors="errors" :serverErr="serverErr" :showAlert="showAlert"/>
+          
           <div>
             <label for="">Title:</label>
             <input ref='titleRef' type="text" v-model="blog.title" :class="{ red : errors.includes('title') }"
@@ -27,11 +28,10 @@
               </div>
           </div>
           <div class="controls">
-              <button class="button">Add Blog</button>
+              <button class="button">Edit Blog</button>
           </div>
           
       </form>  
-
 
 
   </div>
@@ -39,25 +39,28 @@
 </template>
 
 <script>
-import { ref , watch, watchEffect } from 'vue'
+import { ref, watch, watchEffect } from 'vue'
 import Alert from '../../components/Alert.vue'
-import { useStore } from 'vuex'
-
+import store from '../../store'
+import updateBlog from '../../composables/updateBlog'
 
 export default {
-    components:{
-        Alert
-    },
-    setup(){
-        const store = useStore()
-        const blog = ref({title:'',body:'',author:'', tags:[]})
+    components:{ Alert },
+    props:['id'],
+    setup(props){
+
         const tempTag = ref('')
         const errors = ref([])
-        const serverErr = ref(null)
+        const serverErr = ref()
         const showAlert = ref(false)
         const authors = ref(['The Vue Team', 'The Laravel Team','The Tutplus Team'])
 
+        const {blog, serverErr: error } = store.getters.getBlog(props.id)
 
+        watchEffect(() => {
+            serverErr.value = error.value
+        })
+        
         const addTag = (e) => {
               const element = e.path[0]
             if(tempTag.value != ''){
@@ -75,26 +78,30 @@ export default {
             if(blog.value.tags.length == 0 )
                 errors.value.push('tags')  
         }
-        
-        const add = () =>{
+
+        const edit = () =>{
             if(validation()){
-                 store.dispatch('addBlog',blog.value).then(data => {
-                     if( data.value)
-                        serverErr.value = data.value
+                store.dispatch('editBlog',blog.value).then(data => {
+                    const { blog:updatedBlog, serverErr:error} = data
+                    if( error.value)
+                        serverErr.value = error.value
                     else{
+                        blog.value = updatedBlog.value
                         showAlert.value = true
-                         blog.value = {title:'',body:'',author:'', tags:[]}     
-           
                     }
-                 }).catch(error => serverErr.value = error)
+                    
+                }).catch(error =>{
+                    serverErr.value = error
+                })
             }
         }
+
         const validation = () =>{
 
             let data
             errors.value = []
             for(let key in data = blog.value){
-                if( data[key] == '' || data[key] == null){
+                if( data[key] == ''){
                     errors.value.push(key)
                 }
             }
@@ -116,7 +123,8 @@ export default {
             }
 
 
-        return { blog, errors,serverErr,showAlert, authors, addTag, tempTag, deleteTag, add, handleKeyEvent }
+
+        return { blog, errors,serverErr ,showAlert, authors, addTag, tempTag, deleteTag, edit, handleKeyEvent }
     }
 }
 </script>
@@ -175,8 +183,43 @@ export default {
         right: 10px;
         top:0;
     }
+    .error{
+        color: white;
+        background-color: rgb(241, 105, 105);
+        padding: 20px;
+        width: 300px;
+        border-radius: 5px;
+    }
+    .success{
+        color: white;
+        background-color: lightgreen;
+        padding: 20px;
+        width: 300px;
+        display: inline-block;
+        border-radius: 5px;
+    }
+
+    ol{
+        width: 300px;
+        margin: 10px auto;
+    }
+    li{
+        text-align: justify;
+        width: auto;
+        list-style-position: inside;
+    }
+    .alert ol, .alert p{
+        position: relative;
+    }
+    .close{
+        position: absolute;
+        top:0;
+        font-size: 20px;
+        cursor: pointer;
+        right: 5px;
+    }
     .red{
-    border: 1px solid red;
-}
-  
+        border: 1px solid red;
+    }
+
 </style>

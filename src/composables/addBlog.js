@@ -1,28 +1,26 @@
 import { ref } from 'vue'
-const addBlog = (blog) =>{
-    let errors = ref([])
+const addBlog = (data) =>{
+    let serverErr = ref(null)
     const post = async () => {
         try{
-            const data = await fetch('http://localhost:3000/blogs',{
+            const result = await fetch('http://localhost:3000/blogs',{
                 headers:{
                     'Accept':'application/json',
                     'Content-Type':'application/json'
                 },
                 method:'POST',
-                body:JSON.stringify(blog)
+                body:JSON.stringify(data)
             })
 
-            if(!data.ok){
+            if(!result.ok){
                 throw Error('an error occurred during creating blog')
             }
         }
         catch(e){
-            errors.value.push(e.message)
+            serverErr.value = e.message
         }
-
-        return errors.value
+        return serverErr
     }
-
     return { post }
 }
 

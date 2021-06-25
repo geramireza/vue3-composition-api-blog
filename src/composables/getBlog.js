@@ -1,7 +1,7 @@
 import { ref } from 'vue'
 const getBlog = (id) => {
     const blog = ref({})
-    const errors = ref(null)
+    const serverErr = ref()
     
     const load = async () => {
         try{
@@ -12,11 +12,11 @@ const getBlog = (id) => {
             blog.value = await data.json()
         }
         catch(e){
-            errors.value = e.message
+            serverErr.value = e.message 
         }
     }
-
-    return { blog , errors , load }
+    
+    return { blog , serverErr, load }
 
 }
 

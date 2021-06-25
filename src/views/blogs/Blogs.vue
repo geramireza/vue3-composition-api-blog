@@ -1,37 +1,51 @@
 <template>
   <div class="blogs">
-    <div class="blog" v-for="blog in sneppit" :key="blog.id">
+    <ErrorAlert v-if="serverErr" >
+            <template v-slot:title>
+                <h3>Opps!</h3>
+            </template>
+            <template v-slot:body>
+                <p>{{ serverErr }}</p>
+            </template>    
+
+    </ErrorAlert>
+    <SuccessAlert v-if="showAlert" :showAlert="showAlert" @close="showAlert = !showAlert"> 
+    
+     <template v-slot:title>
+       <h3>Success!</h3>
+     </template>
+      <template v-slot:body>
+        <p>The blog deleted successfully</p>
+     </template>
+    </SuccessAlert>
+
+    <div class="blog" v-for="blog in blogs" :key="blog.id">
       <h1><router-link :to="{ name: 'Show', params:{ id: blog.id }}" >{{ blog.title }}</router-link></h1>
       <p>{{ blog.body }}</p>
     </div>
   </div>
+
 </template>
 
 <script>
-import { ref, watch } from 'vue'
-  import getBlogs  from '../../composables/getBlogs'
+import { onMounted, ref, watch } from 'vue'
+import store from '../../store'
+import snippet  from '../../composables/snippet'
+import { useRoute} from 'vue-router'
+import SuccessAlert from '../../components/SuccessAlert.vue'
+import ErrorAlert from '../../components/ErrorAlert.vue'
 
 export default {
+  components:{SuccessAlert, ErrorAlert},
   setup(){
-    const sneppit = ref([])
-    const { blogs , errors , load } = getBlogs()
-    load()
+    const route = useRoute()
+    const showAlert = ref(false)
 
+    const { blogs, serverErr } = store.getters.getBlogs()
+      snippet(blogs.value)
+      showAlert.value = route.params.showAlert
 
-  const sneppitBody = () =>{
-        sneppit.value = blogs.value.map( item => {
-        item.body = item.body.substring(0,80) + '...'
-        return item
-      })
-    }
-
-    watch(blogs ,() => {
-      sneppitBody() 
-    })
-
-
-
-    return { sneppit ,errors}
+    return { blogs ,serverErr,showAlert}
   },
 
 

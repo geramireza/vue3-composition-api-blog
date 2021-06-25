@@ -1,0 +1,41 @@
+.alert{
+    text-align: center;
+}
+ol{
+    width: 300px;
+    margin: 10px auto;
+}
+li{
+    text-align: justify;
+    width: auto;
+    list-style-position: inside;
+}
+.alert ol, .alert p{
+    position: relative;
+}
+.close{
+    position: absolute;
+    top:0;
+    font-size: 20px;
+    cursor: pointer;
+    right: 5px;
+}
+.red{
+    border: 1px solid red;
+}
+
+.error{
+    color: white;
+    background-color: rgb(241, 105, 105);
+    padding: 10px;
+    width: 300px;
+    border-radius: 5px;
+}
+.success{
+    color: white;
+    background-color: lightgreen;
+    padding: 20px;
+    width: 300px;
+    display: inline-block;
+    border-radius: 5px;
+}

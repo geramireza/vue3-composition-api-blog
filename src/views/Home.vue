@@ -1,20 +1,33 @@
 <template>
   <div class="home">
+        <ErrorAlert v-if="serverErr" >
+            <template v-slot:title>
+                <h3>Opps!</h3>
+            </template>
+            <template v-slot:body>
+                <p>{{ serverErr }}</p>
+            </template>    
+
+        </ErrorAlert>
+
     <ul>
       <li v-for="blog in blogs" :key="blog.id" ><router-link :to="'/blog/' + blog.id" >{{ blog.title }}</router-link></li>
     </ul>
+
   </div>
 </template>
 
 <script>
-  import getBlogs  from '../composables/getBlogs'
+  import store from '../store'
+  import ErrorAlert from '../components/ErrorAlert.vue'
 
 export default {
+  components:{ErrorAlert},
   setup(){
-    const { blogs , errors , load } = getBlogs()
-    
-    load()
-    return { blogs ,errors }
+    const {blogs,serverErr } = store.getters.getBlogs()
+
+    return { blogs ,serverErr }
+
   },
 
 
@@ -23,6 +36,14 @@ export default {
 </script>
 
 <style scoped>
+.home{
+    max-width: 700px;
+    margin: 10px auto;
+    background-color: white;
+    font-size: 18px;
+    padding: 30px;
+    text-align: left;
+  }
   ul{
     list-style: none;
     max-width: 700px;

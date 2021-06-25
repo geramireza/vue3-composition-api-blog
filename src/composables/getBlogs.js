@@ -1,7 +1,7 @@
 import { ref } from 'vue'
 const getBlogs = () => {
     const blogs = ref([])
-    const errors = ref(null)
+    const serverErr = ref(null)
 
     const load = async () => {
         try{
@@ -9,14 +9,14 @@ const getBlogs = () => {
             if(!data.ok){
                 throw Error('an error occured during loading')
             }
-            blogs.value = await data.json()
+            blogs.value = (await data.json()).reverse()
         }
         catch(e){
-            errors.value = e.message 
+            serverErr.value = e.message 
         }
     }
         
-    return { blogs , errors, load }
+    return { blogs , serverErr, load }
 }
 
 export default getBlogs
